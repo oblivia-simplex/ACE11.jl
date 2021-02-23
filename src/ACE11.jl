@@ -96,7 +96,7 @@ COMMANDS =
 
 function read_input_bit(i)
     command = COMMANDS["read_input_bits"][i]
-
+    return command
 end
 
 function send_commands(commands, portname=PORTNAME, baudrate=BAUDRATE)
@@ -130,13 +130,6 @@ function send_commands(commands, portname=PORTNAME, baudrate=BAUDRATE)
     return rx
 end
 
-         
 
-
-
-
-function comm(tty = "/dev/ttyACM0")
-
-end
 
 end # module
