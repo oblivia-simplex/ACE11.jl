@@ -106,7 +106,7 @@ end
 
 # This function lets us treat the device like a black boxed boolean function
 # of up to 6 variables.
-function call_boolean(args::Vector{Bool}; ret_bits=[1] portname=PORTNAME, baudrate=BAUDRATE)
+function call_boolean(args::Vector{Bool}; ret_bits=[1], portname=PORTNAME, baudrate=BAUDRATE)
     @assert length(args) <= 6
     bits = [i for (i,x) in enumerate(args) if x]
     write_cmds = [
