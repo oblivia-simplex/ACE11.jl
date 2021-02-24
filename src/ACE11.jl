@@ -18,19 +18,20 @@ off = false
 
 
 BAUDRATE = 9600
+DELAY = 0.1
 
 PREFIX = [0x56, 0xff, 0xff, 0x00]
 
-function mk_set_command(bits::String, on)
+function mk_write_command(bits::String, on)
     if bits == "all"
-        return mk_set_command(1:6, on)
+        return mk_write_command(1:6, on)
     else
         error("$bits is not a valid value for bits")
     end
 end
 
 
-function mk_set_command(bits, on)
+function mk_write_command(bits, on)
     @assert all(1 <= i <= 6 for i in bits)
     mask = sum(1<<(i-1) for i in bits)
     cmd = [
@@ -84,14 +85,14 @@ function send_commands(commands; portname=PORTNAME, baudrate=BAUDRATE)
     for command in String.(commands)
         @show command
         write(sp, command)
-        sleep(0.1)
+        sleep(DELAY)
 
         rx_raw = []
         while bytesavailable(sp) > 0
             push!(rx_raw, read(sp))
         end
 
-        sleep(0.1)
+        sleep(DELAY)
 
         @show rx_raw
 
@@ -102,6 +103,34 @@ function send_commands(commands; portname=PORTNAME, baudrate=BAUDRATE)
 
     return rx
 end
+
+# This function lets us treat the device like a black boxed boolean function
+# of up to 6 variables.
+function call_boolean(args::Vector{Bool}; ret_bits=[1] portname=PORTNAME, baudrate=BAUDRATE)
+    @assert length(args) <= 6
+    bits = [i for (i,x) in enumerate(args) if x]
+    write_cmds = [
+        mk_write_command(1:6, false),  # set all the bits to the off position
+        mk_write_command(bits, true),  # set the true bits to the on position
+    ]
+    read_cmds = [mk_read_command(i) for i in ret_bits]
+    cmds = [
+        CONTROL_COMMANDS["reset"],     # reset the routine to the beginning
+        write_cmds...,
+        CONTROL_COMMANDS["play"],      # start the routine at the current position
+        read_cmds...,                  # Read the return value in designated pins
+        CONTROL_COMMANDS["pause"],     # pause the routine at the current position
+    ]
+    @show received = send_commands(write_cmds)
+    # Now we just need to decode the return message
+    return false # FIXME
+end
+
+
+    
+
+
+
 
 
 
