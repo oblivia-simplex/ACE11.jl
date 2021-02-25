@@ -81,7 +81,7 @@ COMMANDS = [
 ] |> Dict
 
 
-function test_set_command(bits, on)
+function test_write_command(bits, on)
     if bits == 1:6
         bitsname = "all"
     else
@@ -90,7 +90,7 @@ function test_set_command(bits, on)
     name = "set_output_$(bitsname)_$(on ? "on" : "off")"
     println("[+] Testing $name")
     expected = COMMANDS[name]
-    received = ACE11.mk_set_command(bits, on)
+    received = ACE11.mk_write_command(bits, on)
     @test expected == received
 end
 
@@ -109,8 +109,8 @@ for bit in 1:6
     test_read_command(bit, true)
     test_read_command(bit, false)
     bits = [bit]
-    test_set_command(bits, true)
-    test_set_command(bits, false)
+    test_write_command(bits, true)
+    test_write_command(bits, false)
 end
 
 #test_set_command(1:6, true)
