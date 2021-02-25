@@ -20,6 +20,13 @@ off = false
 BAUDRATE = 9600
 DELAY = 0.1
 
+function set_delay(t)
+    global DELAY
+    DELAY = t
+end
+
+GAP = 0x00
+
 PREFIX = [0x56, 0xff, 0xff, 0x00]
 
 function mk_write_command(bits::String, on)
@@ -37,7 +44,7 @@ function mk_write_command(bits, on)
     cmd = [
         PREFIX...,
         0x15, 0x11, 0x01, 0x00, 0x01, 0x00, 0x00, 0x09, 0x01,
-        0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00,
+        0x00, 0x00, 0x01, 0x00, GAP, 0x00, 0x00, GAP,
     ]
     cmd[18] = mask
     cmd[21] = UInt8(on)
@@ -106,8 +113,15 @@ end
 
 # This function lets us treat the device like a black boxed boolean function
 # of up to 6 variables.
-function call_boolean(args::Vector{Bool}; ret_bits=[1], portname=PORTNAME, baudrate=BAUDRATE)
+function call_boolean(args::Vector{Bool};
+                      ret_bits=[1],
+                      portname=PORTNAME,
+                      baudrate=BAUDRATE,
+                      mockup::Union{Nothing,Function}=nothing)
     @assert length(args) <= 6
+    if mockup !== nothing
+      return mockup(args...)
+    end
     bits = [i for (i,x) in enumerate(args) if x]
     write_cmds = [
         mk_write_command(1:6, false),  # set all the bits to the off position
