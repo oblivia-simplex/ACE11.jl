@@ -18,6 +18,7 @@ off = false
 
 
 BAUDRATE = 9600
+PORTNAME = "/dev/ttyACM0"
 DELAY = 0.1
 
 function set_delay(t)
@@ -115,12 +116,12 @@ MOCKUP = nothing
 
 
 function install_mockup(f)
-    MOCKUP = f
+    global MOCKUP = f
 end
 
 
 function uninstall_mockup(f)
-    MOCKUP = nothing
+    global MOCKUP = nothing
 end
 
 
