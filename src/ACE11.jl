@@ -120,7 +120,7 @@ function install_mockup(f)
 end
 
 
-function uninstall_mockup(f)
+function uninstall_mockup()
     global MOCKUP = nothing
 end
 
