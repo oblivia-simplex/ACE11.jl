@@ -26,7 +26,6 @@ function set_delay(t)
 end
 
 GAP = 0x00
-
 PREFIX = [0x56, 0xff, 0xff, 0x00]
 
 function mk_write_command(bits::String, on)
@@ -111,13 +110,27 @@ function send_commands(commands; portname=PORTNAME, baudrate=BAUDRATE)
     return rx
 end
 
+
+MOCKUP = nothing
+
+
+function install_mockup(f)
+    MOCKUP = f
+end
+
+
+function uninstall_mockup(f)
+    MOCKUP = nothing
+end
+
+
 # This function lets us treat the device like a black boxed boolean function
 # of up to 6 variables.
 function call_boolean(args::Vector{Bool};
                       ret_bits=[1],
                       portname=PORTNAME,
                       baudrate=BAUDRATE,
-                      mockup::Union{Nothing,Function}=nothing)
+                      mockup::Union{Nothing,Function}=MOCKUP)
     @assert length(args) <= 6
     if mockup !== nothing
       return mockup(args...)
