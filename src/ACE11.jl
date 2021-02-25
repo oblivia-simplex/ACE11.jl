@@ -53,7 +53,7 @@ end
 
 
 function mk_read_command(bit, output=false)
-    cmd = [PREFIX..., 0x08, 0x0a, 0x00, 0x01]
+    cmd = [PREFIX..., 0x08, 0x0a, GAP, 0x01]
     idx = output ? bit + 6 : bit
     cmd[8] = idx
     return cmd
